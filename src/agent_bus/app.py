@@ -10,7 +10,7 @@ from starlette.websockets import WebSocketState
 from agent_bus.backend import BusBackend, build_backend
 from agent_bus.config import BusConfig
 from agent_bus.contracts import KNOWN_TYPES, ContractError, validate_envelope
-from agent_bus.models import AckRequest, BusEnvelope, ConsumeResponse, DeadletterResponse, HealthResponse, SnapshotResponse, StoredEnvelope, StreamKind
+from agent_bus.models import AckRequest, BusEnvelope, ConsumeResponse, DeadletterResponse, HealthResponse, PendingKind, PendingResponse, SnapshotResponse, StoredEnvelope, StreamKind
 
 
 class WebsocketHub:
@@ -74,6 +74,20 @@ def create_app(config: BusConfig | None = None, backend: BusBackend | None = Non
     async def deadletter_recent(count: int = 20) -> DeadletterResponse:
         bounded_count = min(max(count, 1), 100)
         return DeadletterResponse(entries=await app.state.backend.deadletter_recent(bounded_count))
+
+    @app.get("/streams/{kind}/pending", response_model=PendingResponse)
+    async def stream_pending(
+        kind: PendingKind,
+        group: Annotated[str, Query(min_length=1)],
+    ) -> PendingResponse:
+        stream_map = {
+            "commands": config.commands_stream,
+            "events": config.events_stream,
+            "snapshots": config.snapshots_stream,
+            "deadletter": config.deadletter_stream,
+        }
+        pending = await app.state.backend.pending_messages(kind, group=group)
+        return PendingResponse(stream=stream_map[kind], group=group, pending=pending)
 
     @app.post("/events", response_model=StoredEnvelope)
     async def publish_event(envelope: BusEnvelope) -> StoredEnvelope:

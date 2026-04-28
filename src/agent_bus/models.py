@@ -7,6 +7,7 @@ from uuid import uuid4
 from pydantic import BaseModel, Field, field_validator
 
 StreamKind = Literal["commands", "events"]
+PendingKind = Literal["commands", "events", "snapshots", "deadletter"]
 
 
 def utc_timestamp() -> str:
@@ -61,3 +62,16 @@ class SnapshotResponse(BaseModel):
 
 class DeadletterResponse(BaseModel):
     entries: list[dict[str, Any]] = Field(default_factory=list)
+
+
+class PendingMessage(BaseModel):
+    message_id: str
+    consumer: str
+    idle_ms: int
+    delivery_count: int
+
+
+class PendingResponse(BaseModel):
+    stream: str
+    group: str
+    pending: list[PendingMessage] = Field(default_factory=list)

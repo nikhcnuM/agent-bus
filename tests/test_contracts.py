@@ -212,5 +212,8 @@ async def test_redis_backend_deadletters_invalid_payload_for_known_type() -> Non
     assert fake.xacks == [("agentbus.events", "g", "9-0")]
     assert fake.xadds and fake.xadds[0][0] == "agentbus.deadletter"
     fields = fake.xadds[0][1]
-    assert fields["reason"] == "payload.transcript is required"
+    assert fields["reason"] == "contract_error"
     assert fields["field"] == "payload.transcript"
+    assert "payload.transcript is required" in fields["error"]
+    assert fields["original_stream"] == "agentbus.events"
+    assert fields["original_message_id"] == "9-0"

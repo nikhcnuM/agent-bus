@@ -19,6 +19,10 @@ class BusConfig(BaseModel):
     retention_maxlen: int = 10000
     replay_window: int = 100
     default_group: str = "agent-assistant"
+    # Pending-message recovery
+    pending_idle_ms: int = 30_000
+    pending_claim_count: int = 10
+    max_delivery_attempts: int = 5
 
     @property
     def commands_stream(self) -> str:
