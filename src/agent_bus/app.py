@@ -3,11 +3,13 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 from typing import Annotated
 
-from fastapi import FastAPI, HTTPException, Query, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect, status
+from pydantic import ValidationError
+from starlette.websockets import WebSocketState
 
 from agent_bus.backend import BusBackend, build_backend
 from agent_bus.config import BusConfig
-from agent_bus.models import AckRequest, BusEnvelope, ConsumeResponse, HealthResponse, SnapshotResponse, StoredEnvelope, StreamKind
+from agent_bus.models import AckRequest, BusEnvelope, ConsumeResponse, DeadletterResponse, HealthResponse, SnapshotResponse, StoredEnvelope, StreamKind
 
 
 class WebsocketHub:
@@ -67,6 +69,11 @@ def create_app(config: BusConfig | None = None, backend: BusBackend | None = Non
     async def snapshot() -> SnapshotResponse:
         return SnapshotResponse(snapshot=await app.state.backend.snapshot())
 
+    @app.get("/deadletter/recent", response_model=DeadletterResponse)
+    async def deadletter_recent(count: int = 20) -> DeadletterResponse:
+        bounded_count = min(max(count, 1), 100)
+        return DeadletterResponse(entries=await app.state.backend.deadletter_recent(bounded_count))
+
     @app.post("/events", response_model=StoredEnvelope)
     async def publish_event(envelope: BusEnvelope) -> StoredEnvelope:
         return await _publish(app, "events", envelope)
@@ -108,9 +115,14 @@ def create_app(config: BusConfig | None = None, backend: BusBackend | None = Non
                 await _publish(app, kind, envelope)
         except WebSocketDisconnect:
             hub.disconnect(websocket)
-        except Exception as exc:  # noqa: BLE001
+        except (ValidationError, ValueError, TypeError):
             hub.disconnect(websocket)
-            raise HTTPException(status_code=400, detail=str(exc)) from exc
+            if websocket.client_state != WebSocketState.DISCONNECTED:
+                await websocket.close(code=status.WS_1003_UNSUPPORTED_DATA)
+        except Exception:  # noqa: BLE001
+            hub.disconnect(websocket)
+            if websocket.client_state != WebSocketState.DISCONNECTED:
+                await websocket.close(code=status.WS_1011_INTERNAL_ERROR)
 
     return app
 

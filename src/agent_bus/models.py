@@ -57,3 +57,7 @@ class HealthResponse(BaseModel):
 
 class SnapshotResponse(BaseModel):
     snapshot: dict[str, Any] = Field(default_factory=dict)
+
+
+class DeadletterResponse(BaseModel):
+    entries: list[dict[str, Any]] = Field(default_factory=list)

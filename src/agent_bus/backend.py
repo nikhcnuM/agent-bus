@@ -28,6 +28,8 @@ class BusBackend(Protocol):
 
     async def snapshot(self) -> dict[str, Any]: ...
 
+    async def deadletter_recent(self, count: int = 20) -> list[dict[str, Any]]: ...
+
     async def close(self) -> None: ...
 
 
@@ -46,6 +48,7 @@ class InMemoryBackend:
     config: BusConfig
     name: str = "memory"
     _streams: dict[str, list[StoredEnvelope]] = field(default_factory=lambda: defaultdict(list))
+    _deadletter: list[dict[str, Any]] = field(default_factory=list)
     _offsets: dict[tuple[str, str], int] = field(default_factory=dict)
     _snapshot: dict[str, Any] = field(default_factory=dict)
     _next_id: int = 0
@@ -77,6 +80,9 @@ class InMemoryBackend:
 
     async def snapshot(self) -> dict[str, Any]:
         return dict(self._snapshot)
+
+    async def deadletter_recent(self, count: int = 20) -> list[dict[str, Any]]:
+        return list(reversed(self._deadletter[-count:]))
 
     async def close(self) -> None:
         return None
@@ -137,6 +143,7 @@ class RedisStreamBackend:
                 raw = fields.get("envelope")
                 if not raw:
                     await self._redis.xadd(self.config.deadletter_stream, {"stream_id": stream_id, "reason": "missing envelope"})
+                    await self._redis.xack(stream, group, stream_id)
                     continue
                 try:
                     envelope = BusEnvelope.model_validate_json(raw)
@@ -164,6 +171,10 @@ class RedisStreamBackend:
             if raw:
                 self._snapshot = json.loads(raw)
         return dict(self._snapshot)
+
+    async def deadletter_recent(self, count: int = 20) -> list[dict[str, Any]]:
+        entries = await self._redis.xrevrange(self.config.deadletter_stream, count=count)
+        return [{"stream_id": str(stream_id), "fields": fields} for stream_id, fields in entries]
 
     async def close(self) -> None:
         await self._redis.aclose()
