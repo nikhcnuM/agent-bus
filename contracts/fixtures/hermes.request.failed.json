@@ -1,0 +1,12 @@
+{
+  "id": "evt_hermes_request_failed_0001",
+  "type": "hermes.request.failed",
+  "source": "mac-widget-hermes",
+  "timestamp": "2026-04-28T16:00:09Z",
+  "correlation_id": "ptt-20260428-160000-000000",
+  "session_id": "ptt-20260428-160000-000000",
+  "target": null,
+  "payload": {
+    "detail": "hermes endpoint unreachable"
+  }
+}

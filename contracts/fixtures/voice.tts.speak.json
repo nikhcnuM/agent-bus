@@ -1,0 +1,12 @@
+{
+  "id": "evt_tts_speak_0001",
+  "type": "voice.tts.speak",
+  "source": "mac-widget-hermes",
+  "timestamp": "2026-04-28T16:00:10Z",
+  "correlation_id": "ptt-20260428-160000-000000",
+  "session_id": "ptt-20260428-160000-000000",
+  "target": "agent-voice-gateway",
+  "payload": {
+    "text": "Build lista."
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "evt_tts_started_0001",
+  "type": "voice.tts.started",
+  "source": "agent-voice-gateway",
+  "timestamp": "2026-04-28T16:00:11Z",
+  "correlation_id": "ptt-20260428-160000-000000",
+  "session_id": "ptt-20260428-160000-000000",
+  "target": null,
+  "payload": {
+    "text": "Build lista."
+  }
+}

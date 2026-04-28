@@ -1,0 +1,40 @@
+{
+  "id": "evt_agent_session_updated_0001",
+  "type": "agent.session.updated",
+  "source": "mac-widget-hermes",
+  "timestamp": "2026-04-28T16:00:09Z",
+  "correlation_id": null,
+  "session_id": "ptt-20260428-160000-000000",
+  "target": null,
+  "payload": {
+    "session_id": "ptt-20260428-160000-000000",
+    "agent_id": "hermes-agent",
+    "status": "awaiting_choice",
+    "summary": "Tests passed.",
+    "updated_at": "2026-04-28T16:00:09Z",
+    "alert": {
+      "severity": "info",
+      "mode": "pulse",
+      "color": "yellow",
+      "target": "global"
+    },
+    "options": [
+      {
+        "option_id": "ack",
+        "label": "Acknowledge",
+        "color": "green",
+        "semantic": "confirm",
+        "position": "top_1",
+        "enabled": true
+      },
+      {
+        "option_id": "dismiss",
+        "label": "Dismiss",
+        "color": "red",
+        "semantic": "cancel",
+        "position": "top_2",
+        "enabled": true
+      }
+    ]
+  }
+}

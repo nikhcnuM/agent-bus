@@ -1,0 +1,13 @@
+{
+  "id": "evt_transcription_empty_0001",
+  "type": "voice.transcription.empty",
+  "source": "agent-voice-gateway",
+  "timestamp": "2026-04-28T16:00:02Z",
+  "correlation_id": "ptt-20260428-160000-000000",
+  "session_id": "ptt-20260428-160000-000000",
+  "target": null,
+  "payload": {
+    "session_id": "ptt-20260428-160000-000000",
+    "detail": "rms below floor"
+  }
+}

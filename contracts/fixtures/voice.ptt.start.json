@@ -1,0 +1,12 @@
+{
+  "id": "evt_ptt_start_0001",
+  "type": "voice.ptt.start",
+  "source": "launchpad-system-actions",
+  "timestamp": "2026-04-28T16:00:00Z",
+  "correlation_id": "ptt-20260428-160000-000000",
+  "session_id": null,
+  "target": "agent-voice-gateway",
+  "payload": {
+    "control": "grid:0,0"
+  }
+}

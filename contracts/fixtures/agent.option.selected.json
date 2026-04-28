@@ -1,0 +1,13 @@
+{
+  "id": "evt_agent_option_selected_0001",
+  "type": "agent.option.selected",
+  "source": "launchpad-system-actions",
+  "timestamp": "2026-04-28T16:00:12Z",
+  "correlation_id": null,
+  "session_id": "ptt-20260428-160000-000000",
+  "target": null,
+  "payload": {
+    "option_id": "ack",
+    "selected_control": "top_1"
+  }
+}
