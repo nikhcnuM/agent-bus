@@ -45,6 +45,7 @@ All source lives under `src/agent_bus/`.
 - `POST /commands`
 - `GET /consume/{events|commands}?group=...&consumer=...`
 - `POST /consume/{events|commands}/ack?group=...`
+- `GET /deadletter/recent?count=20`
 - `WS /ws`
 
 WebSocket clients receive an initial snapshot frame:
@@ -71,11 +72,15 @@ Default stream prefix: `agentbus`.
 - `agentbus.deadletter`
 - `agentbus.snapshots`
 
-Production uses Redis Streams. Use Redis AOF locally for durability:
+Production uses Redis Streams. For local development, run Redis in Docker with
+AOF enabled:
 
 ```bash
-redis-server --appendonly yes
+docker compose up -d redis
 ```
+
+This uses `agent-bus/docker-compose.yml`, exposes Redis on `127.0.0.1:6379`,
+and persists data in the Docker volume `agent-bus-redis-data`.
 
 `memory://` is test-only. Do not document or use it as a deployment mode.
 
@@ -103,6 +108,7 @@ shape.
 ## Run And Test
 
 ```bash
+docker compose up -d redis
 ../agent-voice-gateway/.venv/bin/python -m pip install -e .
 ../agent-voice-gateway/.venv/bin/agent-bus --config config.example.yaml
 ../agent-voice-gateway/.venv/bin/python -m pytest
@@ -116,7 +122,7 @@ A dedicated `.venv` is also fine.
 
 ## Pitfalls
 
-- Redis integration tests against a real Redis instance are still needed.
+- Redis integration tests against the Docker Redis instance are still needed.
 - Pending-message recovery and retry counters are first-pass; harden before
   treating this as production.
 - `InMemoryBackend` is intentionally simple and does not model every Redis
