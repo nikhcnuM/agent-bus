@@ -3,12 +3,13 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 from typing import Annotated
 
-from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect, status
+from fastapi import FastAPI, HTTPException, Query, WebSocket, WebSocketDisconnect, status
 from pydantic import ValidationError
 from starlette.websockets import WebSocketState
 
 from agent_bus.backend import BusBackend, build_backend
 from agent_bus.config import BusConfig
+from agent_bus.contracts import KNOWN_TYPES, ContractError, validate_envelope
 from agent_bus.models import AckRequest, BusEnvelope, ConsumeResponse, DeadletterResponse, HealthResponse, SnapshotResponse, StoredEnvelope, StreamKind
 
 
@@ -76,10 +77,12 @@ def create_app(config: BusConfig | None = None, backend: BusBackend | None = Non
 
     @app.post("/events", response_model=StoredEnvelope)
     async def publish_event(envelope: BusEnvelope) -> StoredEnvelope:
+        _enforce_contract(envelope, expected_kind="event")
         return await _publish(app, "events", envelope)
 
     @app.post("/commands", response_model=StoredEnvelope)
     async def publish_command(envelope: BusEnvelope) -> StoredEnvelope:
+        _enforce_contract(envelope, expected_kind="command")
         return await _publish(app, "commands", envelope)
 
     @app.get("/consume/{kind}", response_model=ConsumeResponse)
@@ -111,11 +114,15 @@ def create_app(config: BusConfig | None = None, backend: BusBackend | None = Non
             await websocket.send_json({"snapshot": await app.state.backend.snapshot()})
             while True:
                 envelope = BusEnvelope.model_validate(await websocket.receive_json())
-                kind: StreamKind = "commands" if envelope.target else "events"
+                entry = KNOWN_TYPES.get(envelope.type)
+                if entry is None:
+                    raise ContractError(f"unknown type: {envelope.type}", field="type")
+                validate_envelope(envelope)
+                kind: StreamKind = "commands" if entry.kind == "command" else "events"
                 await _publish(app, kind, envelope)
         except WebSocketDisconnect:
             hub.disconnect(websocket)
-        except (ValidationError, ValueError, TypeError):
+        except (ValidationError, ContractError, ValueError, TypeError):
             hub.disconnect(websocket)
             if websocket.client_state != WebSocketState.DISCONNECTED:
                 await websocket.close(code=status.WS_1003_UNSUPPORTED_DATA)
@@ -125,6 +132,28 @@ def create_app(config: BusConfig | None = None, backend: BusBackend | None = Non
                 await websocket.close(code=status.WS_1011_INTERNAL_ERROR)
 
     return app
+
+
+def _enforce_contract(envelope: BusEnvelope, *, expected_kind: str) -> None:
+    entry = KNOWN_TYPES.get(envelope.type)
+    if entry is None:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail={"type": "contract_error", "reason": f"unknown type: {envelope.type}", "field": "type"},
+        )
+    if entry.kind != expected_kind:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail={
+                "type": "contract_error",
+                "reason": f"type {envelope.type} must be published as {entry.kind}",
+                "field": "type",
+            },
+        )
+    try:
+        validate_envelope(envelope)
+    except ContractError as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=exc.to_dict()) from exc
 
 
 async def _publish(app: FastAPI, kind: StreamKind, envelope: BusEnvelope) -> StoredEnvelope:

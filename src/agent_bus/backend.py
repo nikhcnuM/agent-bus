@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol
 
 from agent_bus.config import BusConfig
+from agent_bus.contracts import ContractError, validate_envelope
 from agent_bus.models import BusEnvelope, StoredEnvelope, StreamKind
 
 
@@ -151,6 +152,20 @@ class RedisStreamBackend:
                     await self._redis.xadd(
                         self.config.deadletter_stream,
                         {"stream_id": stream_id, "reason": str(exc), "payload": raw},
+                    )
+                    await self._redis.xack(stream, group, stream_id)
+                    continue
+                try:
+                    validate_envelope(envelope)
+                except ContractError as exc:
+                    await self._redis.xadd(
+                        self.config.deadletter_stream,
+                        {
+                            "stream_id": stream_id,
+                            "reason": exc.reason,
+                            "field": exc.field or "",
+                            "payload": raw,
+                        },
                     )
                     await self._redis.xack(stream, group, stream_id)
                     continue
