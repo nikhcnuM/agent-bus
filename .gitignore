@@ -1,1 +1,9 @@
 .pyenv/
+src/agent_bus/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.pytest_cache/

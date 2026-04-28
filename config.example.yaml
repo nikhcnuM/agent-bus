@@ -1,0 +1,9 @@
+server:
+  host: 127.0.0.1
+  port: 8790
+
+redis_url: redis://127.0.0.1:6379/0
+stream_prefix: agentbus
+retention_maxlen: 10000
+replay_window: 100
+default_group: agent-assistant
