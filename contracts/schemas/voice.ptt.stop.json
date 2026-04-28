@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "required": [],
+  "properties": {
+    "control": {"type": "string"}
+  },
+  "additionalProperties": true
+}

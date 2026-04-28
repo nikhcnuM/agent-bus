@@ -1,0 +1,44 @@
+{
+  "type": "object",
+  "required": ["session_id", "agent_id", "status", "options"],
+  "properties": {
+    "session_id": {"type": "string", "minLength": 1},
+    "agent_id": {"type": "string", "minLength": 1},
+    "status": {
+      "type": "string",
+      "enum": ["idle", "running", "needs_attention", "awaiting_choice", "error", "completed"]
+    },
+    "summary": {"type": ["string", "null"]},
+    "updated_at": {"type": "string"},
+    "alert": {
+      "type": ["object", "null"],
+      "properties": {
+        "severity": {"type": "string", "enum": ["info", "warning", "critical"]},
+        "mode": {"type": "string", "enum": ["solid", "flash", "pulse"]},
+        "color": {"type": "string"},
+        "target": {"type": "string"}
+      },
+      "additionalProperties": true
+    },
+    "options": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["option_id"],
+        "properties": {
+          "option_id": {"type": "string", "minLength": 1},
+          "label": {"type": ["string", "null"]},
+          "color": {"type": "string"},
+          "semantic": {
+            "type": "string",
+            "enum": ["confirm", "cancel", "retry", "clarify", "choose", "custom"]
+          },
+          "position": {"type": ["string", "null"]},
+          "enabled": {"type": "boolean"}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

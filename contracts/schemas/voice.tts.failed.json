@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "required": ["detail"],
+  "properties": {
+    "detail": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": true
+}

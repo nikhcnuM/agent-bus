@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "required": ["session_id", "transcript"],
+  "properties": {
+    "session_id": {"type": "string", "minLength": 1},
+    "transcript": {"type": "string"}
+  },
+  "additionalProperties": true
+}

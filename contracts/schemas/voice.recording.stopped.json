@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "required": ["session_id", "status"],
+  "properties": {
+    "session_id": {"type": "string", "minLength": 1},
+    "status": {"type": "string", "enum": ["stopped"]}
+  },
+  "additionalProperties": true
+}
