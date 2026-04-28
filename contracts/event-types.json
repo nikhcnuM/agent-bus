@@ -1,0 +1,126 @@
+{
+  "version": "1.0.0",
+  "envelope_required": ["id", "type", "source", "timestamp", "payload"],
+  "envelope_optional": ["correlation_id", "session_id", "target"],
+  "types": {
+    "voice.ptt.start": {
+      "kind": "command",
+      "stream": "commands",
+      "target_required": true,
+      "schema": "schemas/voice.ptt.start.json",
+      "fixture": "fixtures/voice.ptt.start.json"
+    },
+    "voice.ptt.stop": {
+      "kind": "command",
+      "stream": "commands",
+      "target_required": true,
+      "schema": "schemas/voice.ptt.stop.json",
+      "fixture": "fixtures/voice.ptt.stop.json"
+    },
+    "voice.ptt.cancel": {
+      "kind": "command",
+      "stream": "commands",
+      "target_required": true,
+      "schema": "schemas/voice.ptt.cancel.json",
+      "fixture": "fixtures/voice.ptt.cancel.json"
+    },
+    "voice.tts.speak": {
+      "kind": "command",
+      "stream": "commands",
+      "target_required": true,
+      "schema": "schemas/voice.tts.speak.json",
+      "fixture": "fixtures/voice.tts.speak.json"
+    },
+    "voice.recording.started": {
+      "kind": "event",
+      "stream": "events",
+      "target_required": false,
+      "schema": "schemas/voice.recording.started.json",
+      "fixture": "fixtures/voice.recording.started.json"
+    },
+    "voice.recording.stopped": {
+      "kind": "event",
+      "stream": "events",
+      "target_required": false,
+      "schema": "schemas/voice.recording.stopped.json",
+      "fixture": "fixtures/voice.recording.stopped.json"
+    },
+    "voice.recording.cancelled": {
+      "kind": "event",
+      "stream": "events",
+      "target_required": false,
+      "schema": "schemas/voice.recording.cancelled.json",
+      "fixture": "fixtures/voice.recording.cancelled.json"
+    },
+    "voice.transcription.completed": {
+      "kind": "event",
+      "stream": "events",
+      "target_required": false,
+      "schema": "schemas/voice.transcription.completed.json",
+      "fixture": "fixtures/voice.transcription.completed.json"
+    },
+    "voice.transcription.empty": {
+      "kind": "event",
+      "stream": "events",
+      "target_required": false,
+      "schema": "schemas/voice.transcription.empty.json",
+      "fixture": "fixtures/voice.transcription.empty.json"
+    },
+    "voice.tts.started": {
+      "kind": "event",
+      "stream": "events",
+      "target_required": false,
+      "schema": "schemas/voice.tts.started.json",
+      "fixture": "fixtures/voice.tts.started.json"
+    },
+    "voice.tts.completed": {
+      "kind": "event",
+      "stream": "events",
+      "target_required": false,
+      "schema": "schemas/voice.tts.completed.json",
+      "fixture": "fixtures/voice.tts.completed.json"
+    },
+    "voice.tts.failed": {
+      "kind": "event",
+      "stream": "events",
+      "target_required": false,
+      "schema": "schemas/voice.tts.failed.json",
+      "fixture": "fixtures/voice.tts.failed.json"
+    },
+    "hermes.request.started": {
+      "kind": "event",
+      "stream": "events",
+      "target_required": false,
+      "schema": "schemas/hermes.request.started.json",
+      "fixture": "fixtures/hermes.request.started.json"
+    },
+    "hermes.response.completed": {
+      "kind": "event",
+      "stream": "events",
+      "target_required": false,
+      "schema": "schemas/hermes.response.completed.json",
+      "fixture": "fixtures/hermes.response.completed.json"
+    },
+    "hermes.request.failed": {
+      "kind": "event",
+      "stream": "events",
+      "target_required": false,
+      "schema": "schemas/hermes.request.failed.json",
+      "fixture": "fixtures/hermes.request.failed.json"
+    },
+    "agent.session.updated": {
+      "kind": "event",
+      "stream": "events",
+      "target_required": false,
+      "schema": "schemas/agent.session.updated.json",
+      "fixture": "fixtures/agent.session.updated.json"
+    },
+    "agent.option.selected": {
+      "kind": "event",
+      "stream": "events",
+      "target_required": false,
+      "schema": "schemas/agent.option.selected.json",
+      "fixture": "fixtures/agent.option.selected.json"
+    }
+  }
+}
