@@ -30,7 +30,7 @@ def test_publish_event_updates_snapshot_and_consumes_by_group() -> None:
                 "type": "voice.transcription.completed",
                 "source": "agent-voice-gateway",
                 "correlation_id": "ptt-1",
-                "payload": {"transcript": "hola"},
+                "payload": {"session_id": "ptt-1", "transcript": "hola"},
             },
         )
         consumed = c.get("/consume/events?group=mac-widget-hermes&consumer=test")
@@ -68,7 +68,7 @@ def test_websocket_receives_published_events() -> None:
                 json={
                     "type": "agent.option.selected",
                     "source": "launchpad-system-actions",
-                    "payload": {"option_id": "ack"},
+                    "payload": {"option_id": "ack", "selected_control": "top_1"},
                 },
             )
             message = websocket.receive_json()
